@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>THE P2P LEGEND | PIXEL MONITOR</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root { --pixel-green: #00ff41; --pixel-blue: #00e5ff; --warning-gold: #ffcc00; }
+        body { background: #000; color: var(--pixel-green); font-family: 'VT323', monospace; margin: 0; padding: 20px; overflow-x: hidden; }
+        
+        /* FIX NHẢY DÒNG COUNTDOWN */
+        .countdown-container {
+            width: 100%; max-width: 1200px; margin: 0 auto 40px;
+            border: 4px double var(--warning-gold); padding: 30px; text-align: center;
+        }
+        #timer { 
+            font-size: 6vw; color: #fff; display: flex; 
+            justify-content: center; align-items: center; 
+            gap: 15px; white-space: nowrap; /* Giữ 1 hàng duy nhất */
+        }
+        .blink { animation: blink 1s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* TERMINAL STYLE */
+        .terminal { border: 2px solid var(--pixel-green); padding: 20px; max-width: 1000px; margin: 0 auto; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .stat-card { border: 1px solid var(--pixel-green); padding: 15px; text-align: center; }
+        .stat-val { font-size: 2.5em; display: block; color: #fff; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid rgba(0,255,65,0.3); padding: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="countdown-container">
+    <div style="color:var(--warning-gold); margin-bottom:10px;">> NEURAL LINK COUNTDOWN</div>
+    <div id="timer">LOADING...</div>
+</div>
+
+<div class="terminal">
+    <h1 style="text-align:center; letter-spacing:10px;">THE P2P LEGEND</h1>
+    <div class="stats-grid">
+        <div class="stat-card"><span>HOLDERS</span><span id="h-val" class="stat-val">000</span></div>
+        <div class="stat-card"><span>MCAP</span><span id="m-val" class="stat-val">$0</span></div>
+        <div class="stat-card"><span>BTC REWARDS</span><span id="r-val" class="stat-val">0.00</span></div>
+    </div>
+    <table>
+        <thead><tr><th>RANK</th><th>ADDRESS</th><th>BALANCE</th></tr></thead>
+        <tbody id="h-table"></tbody>
+    </table>
+</div>
+
+<script>
+    const API = 'https://inevitably-unvacated-shirl.ngrok-free.dev'; //
+
+    // Countdown Logic
+    setInterval(() => {
+        const gap = new Date("April 5, 2026 00:00:00") - new Date();
+        const d = Math.floor(gap / 86400000);
+        const h = Math.floor((gap % 86400000) / 3600000);
+        const m = Math.floor((gap % 3600000) / 60000);
+        const s = Math.floor((gap % 60000) / 1000);
+        document.getElementById('timer').innerHTML = `${d}D : ${h}H : ${m}M : <span class="blink" style="color:red">${s}S</span>`;
+    }, 1000);
+
+    // Sync Data
+    async function sync() {
+        try {
+            const res = await fetch(`${API}/api/stats`);
+            const data = await res.json();
+            document.getElementById('h-val').innerText = data.totalHolders;
+            document.getElementById('r-val').innerText = data.totalBtcDistributed.toFixed(4);
+            document.getElementById('h-table').innerHTML = data.topHolders.map(h => 
+                `<tr><td>${h.rank}</td><td>${h.wallet}</td><td>${h.balance}</td></tr>`).join('');
+        } catch(e) { console.log("Offline"); }
+    }
+    setInterval(sync, 5000); sync();
+</script>
+</body>
+</html>
