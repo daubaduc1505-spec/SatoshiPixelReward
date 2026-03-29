@@ -2,215 +2,164 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>THE P2P LEGEND | MATRIX NEURAL MONITOR</title>
+    <title>THE P2P LEGEND | SATOSHI NEURAL MONITOR</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
-        :root { --p-green: #00ff41; --p-blue: #00e5ff; --p-gold: #ffcc00; --p-red: #ff3131; }
+        :root { --p-green: #00ff41; --p-gold: #ffcc00; --p-blue: #00e5ff; --p-red: #ff3131; }
         * { box-sizing: border-box; cursor: crosshair; }
-        body { background: #000; color: var(--p-green); font-family: 'VT323', monospace; margin: 0; overflow-x: hidden; position: relative; min-height: 150vh; }
+        body { 
+            background: #000; color: var(--p-green); font-family: 'VT323', monospace; 
+            margin: 0; overflow-x: hidden; position: relative; padding: 20px;
+            display: flex; flex-direction: column; align-items: center;
+        }
 
-        /* HIỆU ỨNG BITCOIN RƠI (SỬ DỤNG HÌNH ẢNH) */
+        /* BITCOIN RAIN EFFECT */
         .btc-particle {
-            position: fixed; top: -100px; width: 32px; height: 32px;
-            background-image: url('btc_coin.png'); /* SỬ DỤNG FILE BTC_COIN.PNG */
+            position: fixed; top: -50px; width: 32px; height: 32px;
+            background-image: url('btc_coin.png'); 
             background-size: contain; background-repeat: no-repeat;
-            user-select: none; pointer-events: none; z-index: 1; animation: fall linear infinite;
+            z-index: 1; animation: fall linear infinite; pointer-events: none;
         }
         @keyframes fall { to { transform: translateY(115vh) rotate(360deg); } }
 
-        /* CRT SCANLINES */
-        body::before {
-            content: " "; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-            background-size: 100% 4px; z-index: 100; pointer-events: none;
+        /* DOUBLE BORDER HEADER */
+        .header-box { 
+            border: 4px double var(--p-gold); padding: 20px; text-align: center; 
+            margin-bottom: 20px; background: rgba(0,0,0,0.9); width: 100%; max-width: 900px;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.2);
         }
-
-        .container { position: relative; z-index: 10; max-width: 1000px; margin: 0 auto; padding: 20px; }
-
-        /* HEADER & BỘ ĐẾM */
-        .header-box { border: 3px double var(--p-gold); padding: 20px; text-align: center; margin-bottom: 20px; background: rgba(0,0,0,0.85); box-shadow: 0 0 15px rgba(255, 204, 0, 0.2); }
         #timer { font-size: 5.5vw; color: #fff; display: flex; justify-content: center; gap: 15px; white-space: nowrap; }
         .blink { animation: blink 1s step-end infinite; }
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* THÔNG SỐ CHÍNH (THỜI GIAN THỰC) */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-card { border: 1px solid var(--p-green); padding: 15px; text-align: center; background: rgba(0,25,0,0.8); position: relative; }
-        .stat-label { font-size: 1.1em; color: var(--p-blue); display: block; margin-bottom: 5px; text-transform: uppercase; }
-        .stat-val { font-size: 3em; color: #fff; text-shadow: 0 0 10px var(--p-green); }
+        /* MAIN DASHBOARD */
+        .main-ui { border: 1px solid var(--p-green); padding: 20px; width: 100%; max-width: 900px; background: rgba(0,15,0,0.85); position: relative; z-index: 10; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
+        .stat-card { border: 1px solid rgba(0,255,65,0.4); padding: 15px; text-align: center; background: rgba(0,0,0,0.5); }
+        .stat-label { color: var(--p-blue); font-size: 1.1em; letter-spacing: 1px; }
+        .stat-val { font-size: 2.8em; color: #fff; display: block; text-shadow: 0 0 10px var(--p-green); }
 
-        /* COMMAND FEED */
-        .command-feed { 
-            border: 1px solid var(--p-green); height: 130px; background: rgba(5,5,5,0.9); 
-            padding: 15px; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 10px var(--p-green);
+        /* BUY FEED <$2 */
+        .feed-box { border: 1px solid rgba(0,255,65,0.3); height: 110px; padding: 10px; overflow: hidden; margin-bottom: 20px; font-size: 1.05em; background: #050505; }
+        .feed-item { margin-bottom: 6px; animation: slideIn 0.3s ease-out; color: #888; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-15px); } }
+
+        /* 2-COLUMN HOLDER TABLE */
+        .holder-wrap { border: 1px solid var(--p-gold); padding: 15px; background: rgba(0,0,0,0.6); }
+        .table-container { display: flex; gap: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95em; }
+        th { color: var(--p-gold); border-bottom: 1px solid var(--p-gold); padding: 5px; text-align: left; }
+        td { padding: 6px 2px; }
+        .addr { color: var(--p-blue); font-family: monospace; }
+
+        /* FOOTER BUTTONS */
+        .social-links { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px; width: 100%; max-width: 900px; }
+        .btn-link { 
+            border: 2px solid var(--p-gold); color: var(--p-gold); padding: 15px; 
+            text-align: center; text-decoration: none; font-size: 1.6em; font-weight: bold; background: #000;
         }
-        .feed-item { margin-bottom: 6px; animation: slideIn 0.3s ease-out; color: #aaa; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: translateX(0); } }
-
-        /* BẢNG HOLDER (DỮ LIỆU THỰC) */
-        .holder-table-section { margin-top: 30px; }
-        .table-header { font-size: 1.3em; color: var(--p-gold); margin-bottom: 15px; border-left: 4px solid var(--p-gold); padding-left: 10px; }
-        table { width: 100%; border-collapse: collapse; background: rgba(0, 15, 0, 0.7); }
-        th, td { border: 1px solid rgba(0, 255, 65, 0.2); padding: 12px; text-align: center; font-size: 1.1em; }
-        th { background: rgba(0, 255, 65, 0.15); color: var(--p-gold); text-transform: uppercase; }
-        tr:hover { background: rgba(0, 255, 65, 0.05); }
-        .wallet-addr { color: var(--p-blue); font-family: monospace; font-size: 0.9em; }
-
-        /* NÚT LINK */
-        .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; margin-bottom: 50px; }
-        .link-card { 
-            text-decoration: none; border: 2px solid var(--p-gold); color: var(--p-gold);
-            padding: 18px; text-align: center; font-size: 1.6em; font-weight: bold;
-            transition: 0.3s; background: rgba(0,0,0,0.5);
-        }
-        .link-card:hover { background: var(--p-gold); color: #000; box-shadow: 0 0 25px var(--p-gold); transform: scale(1.02); }
-
-        /* ĐIỀU KHIỂN NHẠC */
-        .audio-ctrl { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .btn-pixel { background: #000; border: 2px solid var(--p-green); color: var(--p-green); padding: 8px 20px; font-family: 'VT323'; cursor: pointer; font-size: 1.1em; }
-        .btn-pixel:hover { background: var(--p-green); color: #000; }
-        .btn-pixel.active { background: var(--p-gold); border-color: var(--p-gold); color: #000; }
-
-        .shake-effect { animation: shake 0.5s both; }
-        @keyframes shake { 0%, 100% {transform: translate(0);} 25% {transform: translate(-3px, -2px);} 75% {transform: translate(3px, 2px);} }
+        .btn-link:hover { background: var(--p-gold); color: #000; box-shadow: 0 0 20px var(--p-gold); transform: scale(1.02); }
+        .audio-btn { border: 1px solid var(--p-green); color: var(--p-green); background: none; padding: 5px 15px; cursor: pointer; font-family: 'VT323'; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header-box">
-        <div style="color:var(--p-gold); margin-bottom:10px; letter-spacing: 2px;">> NEURAL LINK COUNTDOWN TO SATOSHI'S BIRTHDAY</div>
-        <div id="timer">LOADING_DATA...</div>
-    </div>
+<div class="header-box">
+    <div style="color:var(--p-gold); margin-bottom:10px; letter-spacing: 2px;">> NEURAL LINK COUNTDOWN TO SATOSHI'S BIRTHDAY</div>
+    <div id="timer">00D : 00H : 00M : 00S</div>
+</div>
 
-    <div class="audio-ctrl">
-        <button class="btn-pixel" id="playBtn" onclick="toggleMusic(true)">[ PLAY BGM ]</button>
-        <button class="btn-pixel" id="stopBtn" onclick="toggleMusic(false)">[ MUTE ]</button>
-    </div>
+<button class="audio-btn" onclick="toggleMusic()">[ CLICK TO ENABLE SOUND ]</button>
 
+<div class="main-ui">
+    <div style="text-align:center; font-size: 3em; letter-spacing: 12px; margin-bottom: 10px; font-weight: bold;">THE P2P LEGEND</div>
+    
     <div class="stats-grid">
-        <div class="stat-card"><span class="stat-label">HOLDERS</span><span id="h-val" class="stat-val">000</span></div>
-        <div class="stat-card"><span class="stat-label">MARKET CAP</span><span id="m-val" class="stat-val">$0</span></div>
-        <div class="stat-card"><span class="stat-label">BTC DISTRIBUTED</span><span id="r-val" class="stat-val">0.000</span></div>
+        <div class="stat-card">
+            <span class="stat-label">HOLDERS</span>
+            <span id="h-val" class="stat-val">000</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">MARKET CAP</span>
+            <span id="m-val" class="stat-val">$0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">BTC REWARDS</span>
+            <span id="r-val" class="stat-val">0.000</span>
+        </div>
     </div>
 
-    <div id="feed" class="command-feed"></div>
+    <div id="feed" class="feed-box"></div>
 
-    <div class="holder-table-section">
-        <div class="table-header">> TOP 10 LEGENDARY HOLDERS LIST</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>RANK</th>
-                    <th>WALLET ADDRESS</th>
-                    <th>BALANCE</th>
-                    <th>STATUS</th>
-                </tr>
-            </thead>
-            <tbody id="holder-table-body">
-                <tr><td colspan="4">CONNECTING TO SOLANA MAINNET...</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="social-grid">
-        <a href="https://x.com/i/communities/2038186875488522599" target="_blank" class="link-card glitch-hover">VIEW COMMUNITY ON X</a>
-        <a href="https://pump.fun/coin/95QdJeTY2WDePpZbu5GnB8uAyVAvngGukhr3yth3pump" target="_blank" class="link-card glitch-hover">TRADE ON PUMPFUN</a>
+    <div class="holder-wrap">
+        <div style="text-align:center; color:var(--p-gold); margin-bottom:12px; font-size: 1.3em; letter-spacing: 2px;">TOP LEGENDARY HOLDERS</div>
+        <div class="table-container">
+            <table id="t1"><thead><tr><th>R</th><th>ADDRESS</th><th>BALANCE</th></tr></thead><tbody></tbody></table>
+            <table id="t2"><thead><tr><th>R</th><th>ADDRESS</th><th>BALANCE</th></tr></thead><tbody></tbody></table>
+        </div>
     </div>
 </div>
 
-<audio id="bgm" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg"></audio>
+<div class="social-links">
+    <a href="https://x.com/i/communities/2038186875488522599" target="_blank" class="btn-link">COMMUNITY ON X</a>
+    <a href="https://pump.fun/coin/95QdJeTY2WDePpZbu5GnB8uAyVAvngGukhr3yth3pump" target="_blank" class="btn-link">TRADE ON PUMPFUN</a>
+</div>
+
+<audio id="bgm" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg"></audio>
 
 <script>
-    // 1. CẤU HÌNH
-    const NGROK_API = 'https://inevitably-unvacated-shirl.ngrok-free.dev'; // LINK CỐ ĐỊNH CỦA BẠN
-    let btcBase = 0; // Để so sánh và tạo hiệu ứng shake
-    const MCAP_MULTI = 150000; // Hệ số giả lập MCAP dựa trên holders
+    const NGROK_API = 'https://inevitably-unvacated-shirl.ngrok-free.dev';
 
-    // 2. Hiệu ứng Bitcoin rơi (Dùng hình ảnh `btc_coin.png`)
-    function createBtcRain() {
-        const btc = document.createElement('div');
-        btc.className = 'btc-particle';
-        btc.style.left = Math.random() * 95 + 'vw';
-        btc.style.animationDuration = (Math.random() * 3 + 4) + 's'; // Tốc độ rơi ngẫu nhiên
-        btc.style.opacity = Math.random() * 0.7 + 0.3; // Độ mờ ngẫu nhiên
-        document.body.appendChild(btc);
-        setTimeout(() => btc.remove(), 7000); // Tự xóa sau khi rơi xong
+    // 1. Bitcoin Rain
+    function startRain() {
+        const b = document.createElement('div');
+        b.className = 'btc-particle';
+        b.style.left = Math.random() * 95 + 'vw';
+        b.style.animationDuration = (Math.random() * 2 + 3) + 's';
+        document.body.appendChild(b);
+        setTimeout(() => b.remove(), 5500);
     }
-    setInterval(createBtcRain, 500); // Mỗi 0.5 giây tạo 1 đồng xu
+    setInterval(startRain, 450);
 
-    // 3. Bộ đếm ngược (April 5th)
+    // 2. Countdown Logic
     setInterval(() => {
         const gap = new Date("April 5, 2026 00:00:00") - new Date();
-        const d = Math.floor(gap / 86400000);
-        const h = Math.floor((gap % 86400000) / 3600000);
-        const m = Math.floor((gap % 3600000) / 60000);
-        const s = Math.floor((gap % 60000) / 1000);
+        const d = Math.floor(gap / 86400000), h = Math.floor((gap % 86400000) / 3600000);
+        const m = Math.floor((gap % 3600000) / 60000), s = Math.floor((gap % 60000) / 1000);
         document.getElementById('timer').innerHTML = `${d}D : ${h.toString().padStart(2,'0')}H : ${m.toString().padStart(2,'0')}M : <span class="blink" style="color:var(--p-red)">${s.toString().padStart(2,'0')}S</span>`;
     }, 1000);
 
-    // 4. Giả lập Feed (Buy < $2)
-    function addFeedItem() {
-        const feed = document.getElementById('feed');
-        const amount = (Math.random() * 1.8 + 0.1).toFixed(2);
-        const addr = "SOL_" + Math.random().toString(36).substring(2, 6).toUpperCase() + "..." + Math.random().toString(36).substring(2, 4).toUpperCase();
+    // 3. Real-time Data Sync
+    async function sync() {
+        try {
+            const res = await fetch(`${NGROK_API}/api/stats`);
+            const data = await res.json();
+            document.getElementById('h-val').innerText = data.totalHolders;
+            document.getElementById('r-val').innerText = data.totalBtcDistributed.toFixed(4);
+            document.getElementById('m-val').innerText = "$" + (data.totalHolders * 125000).toLocaleString();
+            
+            // 2-Column Table Logic
+            const rows = data.topHolders.map(h => `<tr><td>${h.rank}</td><td class="addr">${h.wallet}</td><td>${Number(h.balance).toLocaleString()}</td></tr>`);
+            document.querySelector('#t1 tbody').innerHTML = rows.slice(0,5).join('');
+            document.querySelector('#t2 tbody').innerHTML = rows.slice(5,10).join('');
+        } catch(e) { console.log("Bot connection lost..."); }
+    }
+    setInterval(sync, 10000); sync();
+
+    // 4. Buy Feed Simulator < $2
+    setInterval(() => {
+        const f = document.getElementById('feed');
         const item = document.createElement('div');
         item.className = 'feed-item';
-        item.innerHTML = `> <span style="color:var(--p-blue)">[BLOCKCHAIN]</span> Wallet ${addr} purchased <span style="color:var(--p-gold)">$${amount}</span> of P2P LEGEND`;
-        feed.prepend(item);
-        if(feed.children.length > 5) feed.lastElementChild.remove();
-    }
-    setInterval(addFeedItem, 3000);
+        item.innerHTML = `> [NETWORK] Wallet SOL_${Math.random().toString(36).substring(7).toUpperCase()} swapped $${(Math.random()*1.85).toFixed(2)} for P2P LEGEND`;
+        f.prepend(item);
+        if(f.children.length > 4) f.lastElementChild.remove();
+    }, 4000);
 
-    // 5. Logic đồng bộ dữ liệu thời gian thực từ Bot
-    async function syncSystemData() {
-        try {
-            // TRUY VẤN API THỰC TẾ
-            const response = await fetch(`${NGROK_API}/api/stats`);
-            const data = await response.json();
-
-            // Cập nhật thông số chính
-            document.getElementById('h-val').innerText = data.totalHolders.toString().padStart(3, '0');
-            document.getElementById('r-val').innerText = data.totalBtcDistributed.toFixed(6);
-            
-            // Giả lập Mcap dựa trên data thực
-            document.getElementById('m-val').innerText = "$" + (data.totalHolders * MCAP_MULTI).toLocaleString();
-
-            // Hiệu ứng Shake khi có thưởng mới
-            if(data.totalBtcDistributed > btcBase && btcBase !== 0) {
-                document.getElementById('terminal').classList.add('shake-effect');
-                setTimeout(() => document.getElementById('terminal').classList.remove('shake-effect'), 500);
-            }
-            btcBase = data.totalBtcDistributed;
-
-            // ĐIỀN DỮ LIỆU VÀO BẢNG HOLDER
-            const tableBody = document.getElementById('holder-table-body');
-            tableBody.innerHTML = data.topHolders.slice(0, 10).map(h => `
-                <tr>
-                    <td>${h.rank}</td>
-                    <td class="wallet-addr">${h.wallet}</td>
-                    <td>${Number(h.balance).toLocaleString()}</td>
-                    <td><span style="color:var(--p-green)">VERIFIED</span></td>
-                </tr>
-            `).join('');
-
-        } catch(e) { console.log("System Offline. Check Bot & Ngrok link."); }
-    }
-    setInterval(syncSystemData, 12000); // Mỗi 12 giây cập nhật dữ liệu 1 lần
-    syncSystemData(); // Chạy ngay lập tức khi mở trang
-
-    // 6. Nhạc nền
-    const audio = document.getElementById('bgm');
-    function toggleMusic(play) {
-        if(play) {
-            audio.play().catch(() => alert("Click lại lần nữa để bật nhạc nhé!"));
-            document.getElementById('playBtn').classList.add('active');
-            document.getElementById('stopBtn').classList.remove('active');
-        } else {
-            audio.pause();
-            document.getElementById('playBtn').classList.remove('active');
-            document.getElementById('stopBtn').classList.add('active');
-        }
+    // 5. Music Control
+    function toggleMusic() {
+        const a = document.getElementById('bgm');
+        if (a.paused) a.play().catch(() => {}); else a.pause();
     }
 </script>
 </body>
