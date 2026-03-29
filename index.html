@@ -2,78 +2,165 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>THE P2P LEGEND | PIXEL MONITOR</title>
+    <title>P2P LEGEND | SATOSHI ARCHIVE</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
-        :root { --pixel-green: #00ff41; --pixel-blue: #00e5ff; --warning-gold: #ffcc00; }
-        body { background: #000; color: var(--pixel-green); font-family: 'VT323', monospace; margin: 0; padding: 20px; overflow-x: hidden; }
-        
-        /* FIX NHẢY DÒNG COUNTDOWN */
-        .countdown-container {
-            width: 100%; max-width: 1200px; margin: 0 auto 40px;
-            border: 4px double var(--warning-gold); padding: 30px; text-align: center;
+        :root { --p-green: #00ff41; --p-blue: #00e5ff; --p-gold: #ffcc00; --p-red: #ff3131; }
+        * { box-sizing: border-box; cursor: crosshair; }
+        body { 
+            background: #000; color: var(--p-green); font-family: 'VT323', monospace; 
+            margin: 0; overflow: hidden; position: relative; min-height: 100vh;
         }
-        #timer { 
-            font-size: 6vw; color: #fff; display: flex; 
-            justify-content: center; align-items: center; 
-            gap: 15px; white-space: nowrap; /* Giữ 1 hàng duy nhất */
+
+        /* HIỆU ỨNG BITCOIN RƠI */
+        .btc-particle {
+            position: fixed; top: -50px; font-size: 24px; color: var(--p-gold);
+            user-select: none; pointer-events: none; z-index: 1; animation: fall linear infinite;
         }
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+
+        /* CRT SCANLINES (GIẢ LẬP MÀN HÌNH CŨ) */
+        body::before {
+            content: " "; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px; z-index: 100; pointer-events: none;
+        }
+
+        .container { position: relative; z-index: 10; max-width: 1000px; margin: 0 auto; padding: 20px; }
+
+        /* BỘ ĐẾM NGƯỢC (FIX NHẢY DÒNG) */
+        .header-box { border: 3px double var(--p-gold); padding: 20px; text-align: center; margin-bottom: 20px; background: rgba(0,0,0,0.85); box-shadow: 0 0 15px rgba(255, 204, 0, 0.2); }
+        #timer { font-size: 5.5vw; color: #fff; display: flex; justify-content: center; gap: 15px; white-space: nowrap; }
         .blink { animation: blink 1s step-end infinite; }
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* TERMINAL STYLE */
-        .terminal { border: 2px solid var(--pixel-green); padding: 20px; max-width: 1000px; margin: 0 auto; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin: 20px 0; }
-        .stat-card { border: 1px solid var(--pixel-green); padding: 15px; text-align: center; }
-        .stat-val { font-size: 2.5em; display: block; color: #fff; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid rgba(0,255,65,0.3); padding: 10px; text-align: center; }
+        /* ĐIỀU KHIỂN NHẠC */
+        .audio-ctrl { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .btn-pixel { 
+            background: #000; border: 2px solid var(--p-green); color: var(--p-green); 
+            padding: 8px 20px; font-family: 'VT323'; cursor: pointer; font-size: 1.2em;
+        }
+        .btn-pixel:hover { background: var(--p-green); color: #000; box-shadow: 0 0 10px var(--p-green); }
+        .btn-pixel.active { background: var(--p-gold); border-color: var(--p-gold); color: #000; }
+
+        /* THÔNG SỐ CHÍNH */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { border: 1px solid var(--p-green); padding: 15px; text-align: center; background: rgba(0,25,0,0.8); }
+        .stat-label { font-size: 1.2em; color: var(--p-blue); display: block; margin-bottom: 5px; }
+        .stat-val { font-size: 2.8em; color: #fff; text-shadow: 0 0 10px var(--p-green); }
+
+        /* LỆNH MUA GIẢ LẬP (<$2) */
+        .command-feed { 
+            border: 1px solid var(--p-green); height: 140px; background: rgba(5,5,5,0.9); 
+            padding: 15px; font-size: 1.1em; overflow: hidden; margin-bottom: 25px;
+            box-shadow: inset 0 0 10px var(--p-green);
+        }
+        .feed-item { margin-bottom: 8px; animation: slideIn 0.4s ease-out; color: #aaa; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* LINK MẠNG XÃ HỘI */
+        .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .link-card { 
+            text-decoration: none; border: 2px solid var(--p-gold); color: var(--p-gold);
+            padding: 18px; text-align: center; font-size: 1.6em; font-weight: bold;
+            transition: 0.3s; background: rgba(0,0,0,0.5);
+        }
+        .link-card:hover { background: var(--p-gold); color: #000; box-shadow: 0 0 25px var(--p-gold); transform: scale(1.02); }
     </style>
 </head>
 <body>
 
-<div class="countdown-container">
-    <div style="color:var(--warning-gold); margin-bottom:10px;">> NEURAL LINK COUNTDOWN</div>
-    <div id="timer">LOADING...</div>
+<div class="container">
+    <div class="header-box">
+        <div style="color:var(--p-gold); margin-bottom:10px; letter-spacing: 2px;">> NEURAL LINK COUNTDOWN TO SATOSHI'S BIRTHDAY</div>
+        <div id="timer">LOADING_DATA...</div>
+    </div>
+
+    <div class="audio-ctrl">
+        <button class="btn-pixel" id="playBtn" onclick="toggleMusic(true)">[ PLAY BGM ]</button>
+        <button class="btn-pixel" id="stopBtn" onclick="toggleMusic(false)">[ MUTE ]</button>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card"><span class="stat-label">HOLDERS</span><span id="h-val" class="stat-val">000</span></div>
+        <div class="stat-card"><span class="stat-label">MARKET CAP</span><span id="m-val" class="stat-val">$0</span></div>
+        <div class="stat-card"><span class="stat-label">BTC REWARDS</span><span id="r-val" class="stat-val">0.00</span></div>
+    </div>
+
+    <div id="feed" class="command-feed"></div>
+
+    <div class="social-grid">
+        <a href="https://x.com/i/communities/2038186875488522599" target="_blank" class="link-card">VIEW COMMUNITY ON X</a>
+        <a href="https://pump.fun/coin/95QdJeTY2WDePpZbu5GnB8uAyVAvngGukhr3yth3pump" target="_blank" class="link-card">TRADE ON PUMPFUN</a>
+    </div>
 </div>
 
-<div class="terminal">
-    <h1 style="text-align:center; letter-spacing:10px;">THE P2P LEGEND</h1>
-    <div class="stats-grid">
-        <div class="stat-card"><span>HOLDERS</span><span id="h-val" class="stat-val">000</span></div>
-        <div class="stat-card"><span>MCAP</span><span id="m-val" class="stat-val">$0</span></div>
-        <div class="stat-card"><span>BTC REWARDS</span><span id="r-val" class="stat-val">0.00</span></div>
-    </div>
-    <table>
-        <thead><tr><th>RANK</th><th>ADDRESS</th><th>BALANCE</th></tr></thead>
-        <tbody id="h-table"></tbody>
-    </table>
-</div>
+<audio id="bgm" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg"></audio>
 
 <script>
-    const API = 'https://inevitably-unvacated-shirl.ngrok-free.dev'; //
+    const NGROK_API = 'https://inevitably-unvacated-shirl.ngrok-free.dev';
 
-    // Countdown Logic
+    // 1. Hiệu ứng Bitcoin rơi
+    function createBtc() {
+        const btc = document.createElement('div');
+        btc.className = 'btc-particle';
+        btc.innerHTML = '₿';
+        btc.style.left = Math.random() * 95 + 'vw';
+        btc.style.animationDuration = (Math.random() * 3 + 3) + 's';
+        btc.style.opacity = Math.random();
+        document.body.appendChild(btc);
+        setTimeout(() => btc.remove(), 6000);
+    }
+    setInterval(createBtc, 400);
+
+    // 2. Bộ đếm ngược
     setInterval(() => {
         const gap = new Date("April 5, 2026 00:00:00") - new Date();
         const d = Math.floor(gap / 86400000);
         const h = Math.floor((gap % 86400000) / 3600000);
         const m = Math.floor((gap % 3600000) / 60000);
         const s = Math.floor((gap % 60000) / 1000);
-        document.getElementById('timer').innerHTML = `${d}D : ${h}H : ${m}M : <span class="blink" style="color:red">${s}S</span>`;
+        document.getElementById('timer').innerHTML = `${d}D : ${h}H : ${m}M : <span class="blink" style="color:var(--p-red)">${s}S</span>`;
     }, 1000);
 
-    // Sync Data
+    // 3. Giả lập Feed mua hàng (< $2.00)
+    function addFeedItem() {
+        const feed = document.getElementById('feed');
+        const amount = (Math.random() * 1.8 + 0.1).toFixed(2);
+        const addr = "SOL_" + Math.random().toString(36).substring(2, 6).toUpperCase() + "..." + Math.random().toString(36).substring(2, 4).toUpperCase();
+        
+        const item = document.createElement('div');
+        item.className = 'feed-item';
+        item.innerHTML = `> <span style="color:var(--p-blue)">[BLOCKCHAIN]</span> Wallet ${addr} purchased <span style="color:var(--p-gold)">$${amount}</span> of P2P LEGEND`;
+        
+        feed.prepend(item);
+        if(feed.children.length > 5) feed.lastElementChild.remove();
+    }
+    setInterval(addFeedItem, 3500);
+
+    // 4. Nhạc nền
+    const audio = document.getElementById('bgm');
+    function toggleMusic(play) {
+        if(play) {
+            audio.play().catch(() => alert("Click lại lần nữa để bật nhạc nhé!"));
+            document.getElementById('playBtn').classList.add('active');
+            document.getElementById('stopBtn').classList.remove('active');
+        } else {
+            audio.pause();
+            document.getElementById('playBtn').classList.remove('active');
+            document.getElementById('stopBtn').classList.add('active');
+        }
+    }
+
+    // 5. Đồng bộ với Bot
     async function sync() {
         try {
-            const res = await fetch(`${API}/api/stats`);
+            const res = await fetch(`${NGROK_API}/api/stats`);
             const data = await res.json();
-            document.getElementById('h-val').innerText = data.totalHolders;
+            document.getElementById('h-val').innerText = data.totalHolders.toString().padStart(3, '0');
             document.getElementById('r-val').innerText = data.totalBtcDistributed.toFixed(4);
-            document.getElementById('h-table').innerHTML = data.topHolders.map(h => 
-                `<tr><td>${h.rank}</td><td>${h.wallet}</td><td>${h.balance}</td></tr>`).join('');
-        } catch(e) { console.log("Offline"); }
+            document.getElementById('m-val').innerText = "$" + (data.totalHolders * 127).toLocaleString(); // Giả lập Mcap
+        } catch(e) { console.log("Waiting for Bot..."); }
     }
     setInterval(sync, 5000); sync();
 </script>
