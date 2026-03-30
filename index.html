@@ -2,111 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>THE P2P LEGEND | MATRIX MONITOR</title>
+    <title>THE P2P LEGEND | NEURAL MONITOR</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
         :root { --p-green: #00ff41; --p-gold: #ffcc00; --p-blue: #00e5ff; --p-red: #ff3131; }
-        * { box-sizing: border-box; cursor: crosshair; scroll-behavior: smooth; }
+        * { box-sizing: border-box; cursor: crosshair; }
         body { 
             background: #000; color: var(--p-green); font-family: 'VT323', monospace; 
-            margin: 0; padding: 20px;
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh;
+            margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center;
+            min-height: 120vh; /* Tăng chiều cao để cuộn được */
         }
 
-        /* BITCOIN RAIN - FIX NỀN TRẮNG */
+        /* FIX ĐỒNG XU MẤT NỀN TRẮNG */
         .btc-particle {
-            position: fixed; top: -50px; width: 32px; height: 32px;
-            background-image: url('btc_coin.png'); 
-            background-size: contain; background-repeat: no-repeat;
-            z-index: 1; animation: fall linear infinite; pointer-events: none;
-            /* Lọc bỏ sắc trắng nếu file chưa tách nền tốt */
-            mix-blend-mode: screen; 
+            position: fixed; top: -50px; width: 35px; height: 35px;
+            background-image: url('btc_coin.png'); background-size: contain;
+            background-repeat: no-repeat; z-index: 1; animation: fall linear infinite;
+            mix-blend-mode: screen; /* Lọc bỏ nền tối/trắng của ảnh */
+            filter: drop-shadow(0 0 5px var(--p-gold));
         }
         @keyframes fall { to { transform: translateY(115vh) rotate(360deg); } }
 
-        /* HEADER & COUNTDOWN */
-        .header-box { 
-            border: 4px double var(--p-gold); padding: 15px; text-align: center; 
-            margin-bottom: 20px; background: rgba(0,0,0,0.9); width: 100%; max-width: 1000px;
-        }
+        .header-box { border: 4px double var(--p-gold); padding: 15px; text-align: center; margin-bottom: 20px; width: 100%; max-width: 1000px; }
         #timer { font-size: 5vw; color: #fff; display: flex; justify-content: center; gap: 15px; }
 
-        /* MAIN UI - TĂNG KÍCH THƯỚC ĐỂ HIỆN ĐỦ LIST */
         .main-ui { 
-            border: 1px solid var(--p-green); padding: 25px; 
-            width: 100%; max-width: 1000px; 
-            background: rgba(0,15,0,0.85); 
-            z-index: 10;
-            box-shadow: 0 0 20px rgba(0,255,65,0.2);
+            border: 1px solid var(--p-green); padding: 25px; width: 100%; max-width: 1000px; 
+            background: rgba(0,15,0,0.9); z-index: 10;
         }
         
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-card { border: 1px solid rgba(0,255,65,0.4); padding: 10px; text-align: center; background: rgba(0,0,0,0.5); }
-        .stat-val { font-size: 2.3em; color: #fff; display: block; text-shadow: 0 0 10px var(--p-green); }
+        .stat-card { border: 1px solid rgba(0,255,65,0.4); padding: 10px; text-align: center; }
+        .stat-val { font-size: 2.3em; color: #fff; display: block; }
 
-        /* ACCUMULATING POOL (5 MINS) */
-        .pending-box {
-            border: 2px dashed var(--p-gold); padding: 15px; margin-bottom: 20px; 
-            text-align: center; background: rgba(255,204,0,0.1); border-radius: 8px;
-        }
-        #p-val { font-size: 2.6em; color: #fff; text-shadow: 0 0 15px var(--p-gold); font-weight: bold; }
+        /* BỘ ĐẾM 5 PHÚT */
+        .pending-box { border: 2px dashed var(--p-gold); padding: 15px; margin: 20px 0; text-align: center; background: rgba(255,204,0,0.1); }
+        #p-val { font-size: 2.6em; color: #fff; text-shadow: 0 0 15px var(--p-gold); }
 
-        /* FEED BOX */
-        .feed-box { border: 1px solid rgba(0,255,65,0.3); height: 110px; padding: 10px; overflow: hidden; margin-bottom: 20px; font-size: 1.1em; background: #050505; }
-        .feed-item { margin-bottom: 5px; color: #888; }
+        .feed-box { border: 1px solid rgba(0,255,65,0.3); height: 110px; padding: 10px; overflow: hidden; margin-bottom: 20px; background: #050505; }
+        
+        /* BẢNG HOLDER 2 CỘT RỘNG RÃI */
+        .holder-wrap { border: 1px solid var(--p-gold); padding: 15px; }
+        .table-container { display: flex; gap: 30px; flex-wrap: wrap; }
+        table { flex: 1; min-width: 400px; border-collapse: collapse; }
+        th { color: var(--p-gold); border-bottom: 1px solid var(--p-gold); text-align: left; }
+        td { padding: 8px 0; border-bottom: 1px solid rgba(0,255,65,0.1); }
 
-        /* HOLDERS TABLE 2 COLUMNS */
-        .holder-wrap { border: 1px solid var(--p-gold); padding: 15px; margin-bottom: 20px; }
-        .table-container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-        table { flex: 1; min-width: 400px; border-collapse: collapse; font-size: 1em; }
-        th { color: var(--p-gold); border-bottom: 1px solid var(--p-gold); text-align: left; padding: 8px; }
-        td { padding: 8px; border-bottom: 1px solid rgba(0,255,65,0.1); }
-        .addr { color: var(--p-blue); font-family: monospace; }
+        /* LINK X & PUMPFUN */
+        .social-links { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 1000px; margin: 30px 0; }
+        .btn-link { border: 2px solid var(--p-gold); color: var(--p-gold); padding: 20px; text-align: center; text-decoration: none; font-size: 1.8em; font-weight: bold; }
+        .btn-link:hover { background: var(--p-gold); color: #000; }
 
-        /* SOCIAL & PUMPFUN LINKS */
-        .social-links { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; 
-            width: 100%; max-width: 1000px; margin-top: 20px; margin-bottom: 50px;
-        }
-        .btn-link { 
-            border: 2px solid var(--p-gold); color: var(--p-gold); padding: 20px; 
-            text-align: center; text-decoration: none; font-size: 1.8em; font-weight: bold; 
-            background: rgba(0,0,0,0.8); transition: 0.3s;
-        }
-        .btn-link:hover { background: var(--p-gold); color: #000; box-shadow: 0 0 30px var(--p-gold); }
-
-        .audio-btn { border: 1px solid var(--p-green); color: var(--p-green); background: none; padding: 8px 20px; cursor: pointer; font-family: 'VT323'; margin-bottom: 15px; font-size: 1.2em; }
+        .audio-btn { border: 1px solid var(--p-green); color: var(--p-green); background: none; padding: 10px; cursor: pointer; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="header-box">
-    <div style="color:var(--p-gold); letter-spacing: 2px;">> NEURAL LINK COUNTDOWN TO SATOSHI'S BIRTHDAY</div>
     <div id="timer">00D : 00H : 00M : 00S</div>
 </div>
 
 <button class="audio-btn" onclick="toggleMusic()">[ CLICK TO ENABLE SOUND ]</button>
 
 <div class="main-ui">
-    <div style="text-align:center; font-size: 3em; letter-spacing: 12px; margin-bottom: 15px; font-weight: bold;">THE P2P LEGEND</div>
+    <div style="text-align:center; font-size: 3em; letter-spacing: 10px; margin-bottom: 15px;">THE P2P LEGEND</div>
     
     <div class="stats-grid">
         <div class="stat-card"><span>HOLDERS (REAL)</span><span id="h-val" class="stat-val">0</span></div>
         <div class="stat-card"><span>MARKET CAP</span><span id="m-val" class="stat-val">$0</span></div>
-        <div class="stat-card"><span>TOTAL BTC PAID</span><span id="r-val" class="stat-val">0.00000000</span></div>
+        <div class="stat-card"><span>TOTAL BTC PAID</span><span id="r-val" class="stat-val">0.0000</span></div>
     </div>
 
     <div class="pending-box">
-        <div style="color: var(--p-gold); font-size: 1.3em; letter-spacing: 1px;">NEXT DISTRIBUTION POOL (ACCUMULATING...)</div>
         <div id="p-val">0.00000000 BTC</div>
-        <div style="margin-top: 5px;">TIME REMAINING: <span id="distribute-timer" style="color:var(--p-red); font-weight:bold;">05:00</span></div>
+        <div style="color:var(--p-red)">NEXT REWARD IN: <span id="distribute-timer">05:00</span></div>
     </div>
 
     <div id="feed" class="feed-box"></div>
 
     <div class="holder-wrap">
-        <div style="text-align:center; color:var(--p-gold); margin-bottom:15px; font-size: 1.5em; letter-spacing: 3px;">TOP LEGENDARY HOLDERS</div>
         <div class="table-container">
             <table id="t1"><thead><tr><th>R</th><th>ADDRESS</th><th>BALANCE</th></tr></thead><tbody></tbody></table>
             <table id="t2"><thead><tr><th>R</th><th>ADDRESS</th><th>BALANCE</th></tr></thead><tbody></tbody></table>
@@ -115,11 +89,11 @@
 </div>
 
 <div class="social-links">
-    <a href="https://x.com/YourProfile" target="_blank" class="btn-link">JOIN THE X FORCE</a>
-    <a href="https://pump.fun/YourToken" target="_blank" class="btn-link">BUY ON PUMP.FUN</a>
+    <a href="https://x.com/i/communities/2038186875488522599" target="_blank" class="btn-link">TWITTER / X</a>
+    <a href="https://pump.fun/coin/95QdJeTY2WDePpZbu5GnB8uAyVAvngGukhr3yth3pump" target="_blank" class="btn-link">PUMP.FUN</a>
 </div>
 
-<audio id="bgm" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg"></audio>
+<audio id="bgm" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg"></audio>
 
 <script>
     const API_URL = 'https://inevitably-unvacated-shirl.ngrok-free.dev'; 
@@ -134,56 +108,44 @@
             document.getElementById('r-val').innerText = data.btcRewards.toFixed(8);
             document.getElementById('p-val').innerText = data.pendingRewards.toFixed(8) + " BTC";
 
-            // Cập nhật bộ đếm giây từ server
+            // Bộ đếm 5 phút thực tế
             const mins = Math.floor(data.nextDistributeIn / 60);
             const secs = data.nextDistributeIn % 60;
-            document.getElementById('distribute-timer').innerText = 
-                `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+            document.getElementById('distribute-timer').innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
 
             if(data.topHolders && data.topHolders.length > 0) {
-                const rows = data.topHolders.map(h => `<tr><td>${h.rank}</td><td class="addr">${h.wallet}</td><td>${h.balance}</td></tr>`);
+                const rows = data.topHolders.map(h => `<tr><td>${h.rank}</td><td style="color:var(--p-blue)">${h.wallet}</td><td>${h.balance}</td></tr>`);
                 document.querySelector('#t1 tbody').innerHTML = rows.slice(0, 5).join('');
                 document.querySelector('#t2 tbody').innerHTML = rows.slice(5, 10).join('');
             }
-        } catch (e) { console.log("Reconnecting..."); }
+        } catch (e) {}
     }
 
-    setInterval(syncData, 5000); 
+    setInterval(syncData, 5000); // Cập nhật mỗi 5 giây
     syncData();
 
-    // Birthday Countdown
-    setInterval(() => {
-        const gap = new Date("April 5, 2026 00:00:00") - new Date();
-        const d = Math.floor(gap / 86400000), h = Math.floor((gap % 86400000) / 3600000);
-        const m = Math.floor((gap % 3600000) / 60000), s = Math.floor((gap % 60000) / 1000);
-        document.getElementById('timer').innerText = `${d}D : ${h}H : ${m}M : ${s}S`;
-    }, 1000);
+    function toggleMusic() {
+        const a = document.getElementById('bgm');
+        if (a.paused) a.play(); else a.pause();
+    }
 
-    // Fake Trade Feed < $2
-    setInterval(() => {
-        const f = document.getElementById('feed');
-        const amount = (Math.random() * 1.8 + 0.1).toFixed(2);
-        const item = document.createElement('div');
-        item.className = 'feed-item';
-        item.innerHTML = `> [SCAN] SOL_...${Math.random().toString(36).substring(8).toUpperCase()} buy $${amount} P2P`;
-        f.prepend(item);
-        if(f.children.length > 5) f.lastElementChild.remove();
-    }, 3000);
-
-    // Rain Effect
+    // Hiệu ứng đồng xu rơi
     setInterval(() => {
         const b = document.createElement('div');
         b.className = 'btc-particle';
         b.style.left = Math.random() * 95 + 'vw';
         b.style.animationDuration = (Math.random() * 2 + 3) + 's';
         document.body.appendChild(b);
-        setTimeout(() => b.remove(), 5500);
-    }, 400);
+        setTimeout(() => b.remove(), 6000);
+    }, 500);
 
-    function toggleMusic() {
-        const a = document.getElementById('bgm');
-        if (a.paused) a.play(); else a.pause();
-    }
+    // Countdown chính
+    setInterval(() => {
+        const gap = new Date("April 5, 2026 00:00:00") - new Date();
+        const d = Math.floor(gap / 86400000), h = Math.floor((gap % 86400000) / 3600000);
+        const m = Math.floor((gap % 3600000) / 60000), s = Math.floor((gap % 60000) / 1000);
+        document.getElementById('timer').innerText = `${d}D : ${h}H : ${m}M : ${s}S`;
+    }, 1000);
 </script>
 </body>
 </html>
